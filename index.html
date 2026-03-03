@@ -350,80 +350,134 @@
         </div>
     </div>
 
-    <!-- ═══ Text Encryption Dialog ═══ -->
-    <div id="encrypt-overlay" class="dialog-overlay" onclick="closeEncryption()"></div>
-    <div id="encrypt-dialog" class="settings-dialog ks-dialog encrypt-dialog">
-        <!-- Header with title and history -->
-        <div class="encrypt-header">
-            <div class="encrypt-header-left">
-                <h2 class="dialog-title encrypt-title">Text Encryption</h2>
-            </div>
-            <div class="encrypt-header-right">
+    <!-- ═══ Text Encryption Activity (Full Screen) ═══ -->
+    <div id="encrypt-activity" class="encrypt-activity-overlay">
+        <div class="encrypt-activity-container">
+            <!-- Header Section Card -->
+            <div class="encrypt-header-card">
+                <button class="activity-back-btn" onclick="goHome()">
+                    <svg viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                </button>
+                <h2 class="activity-title">Text Encryption</h2>
                 <button class="dialog-icon-btn encrypt-history-btn" id="btn-encrypt-history" title="History">
                     <svg viewBox="0 0 24 24">
                         <path fill="currentColor" d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
                     </svg>
                 </button>
             </div>
-        </div>
 
-        <!-- Encryption Type Selector -->
-        <div class="encrypt-type-selector">
-            <button type="button" class="encrypt-type-option" id="btn-type-aes" onclick="setEncryptType('aes')">
-                AES-256
-            </button>
-            <button type="button" class="encrypt-type-option active" id="btn-type-base64" onclick="setEncryptType('base64')">
-                Base64
-            </button>
-            <button type="button" class="encrypt-type-option" id="btn-type-base32" onclick="setEncryptType('base32')">
-                Base32
-            </button>
-            <button type="button" class="encrypt-type-option" id="btn-type-base16" onclick="setEncryptType('base16')">
-                Base16
-            </button>
-            <button type="button" class="encrypt-type-option" id="btn-type-base8" onclick="setEncryptType('base8')">
-                Base8
-            </button>
-        </div>
-
-        <!-- Encrypt/Decrypt Toggle -->
-        <div class="encrypt-mode-toggle">
-            <button type="button" class="encrypt-mode-btn active" id="btn-encrypt-mode" onclick="setEncryptMode('encrypt')">
-                Encrypt
-            </button>
-            <button type="button" class="encrypt-mode-btn" id="btn-decrypt-mode" onclick="setEncryptMode('decrypt')">
-                Decrypt
-            </button>
-        </div>
-
-        <!-- Input Fields -->
-        <div class="ks-input-group encrypt-inputs">
-            <div class="ks-section-label">Your Data</div>
-            <textarea id="encrypt-data" class="ks-input encrypt-textarea" placeholder="Enter text to encrypt/decrypt..." rows="4"></textarea>
-
-            <div id="encrypt-key-field">
-                <div class="ks-section-label" id="encrypt-key-label">Secret Key</div>
-                <input type="text" id="encrypt-key" class="ks-input" placeholder="Enter secret key (for AES only)">
-            </div>
-
-            <!-- With Reverser Switch -->
-            <label class="neumorph-switch-container">
-                <div class="switch-label">With Reverser</div>
-                <div class="neumorph-switch">
-                    <input type="checkbox" id="encrypt-reverser">
-                    <span class="slider"></span>
+            <!-- Content Section Card -->
+            <div class="encrypt-content-card">
+                <!-- Encryption Type Selector -->
+                <div class="encrypt-type-selector">
+                    <button type="button" class="encrypt-type-option" id="btn-type-aes" onclick="setEncryptType('aes')">
+                        AES-256
+                    </button>
+                    <button type="button" class="encrypt-type-option active" id="btn-type-base64" onclick="setEncryptType('base64')">
+                        Base64
+                    </button>
+                    <button type="button" class="encrypt-type-option" id="btn-type-base32" onclick="setEncryptType('base32')">
+                        Base32
+                    </button>
+                    <button type="button" class="encrypt-type-option" id="btn-type-base16" onclick="setEncryptType('base16')">
+                        Base16
+                    </button>
+                    <button type="button" class="encrypt-type-option" id="btn-type-base8" onclick="setEncryptType('base8')">
+                        Base8
+                    </button>
                 </div>
-            </label>
-        </div>
 
-        <!-- Action Button -->
-        <div class="ks-form-actions">
-            <button class="dialog-cell dialog-cell-wide ks-gen-btn" id="btn-encrypt-action" onclick="performEncryption()">
-                <svg viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M12 17a2 2 0 0 0 2-2 2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 0 2 2m6-9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h1V6a5 5 0 0 1 10 0v2h1m-6-5a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3z"/>
-                </svg>
-                <span id="encrypt-action-text">Encrypt</span>
-            </button>
+                <!-- Encrypt/Decrypt Toggle -->
+                <div class="encrypt-mode-toggle">
+                    <button type="button" class="encrypt-mode-btn active" id="btn-encrypt-mode" onclick="setEncryptMode('encrypt')">
+                        Encrypt
+                    </button>
+                    <button type="button" class="encrypt-mode-btn" id="btn-decrypt-mode" onclick="setEncryptMode('decrypt')">
+                        Decrypt
+                    </button>
+                </div>
+
+                <!-- Input Textarea -->
+                <div class="encrypt-section">
+                    <div class="ks-section-label">Input Text</div>
+                    <textarea id="encrypt-data" class="ks-input encrypt-textarea" placeholder="Enter text to encrypt/decrypt..." rows="4"></textarea>
+                </div>
+
+                <!-- Output Textarea -->
+                <div class="encrypt-section">
+                    <div class="ks-section-label">Output Result</div>
+                    <textarea id="encrypt-output" class="ks-input encrypt-textarea" placeholder="Result will appear here..." rows="4" readonly></textarea>
+                </div>
+
+                <!-- Key Field (for AES) -->
+                <div class="encrypt-section" id="encrypt-key-field">
+                    <div class="ks-section-label" id="encrypt-key-label">Secret Key</div>
+                    <input type="text" id="encrypt-key" class="ks-input" placeholder="Enter secret key (for AES only)">
+                </div>
+
+                <!-- Switches -->
+                <div class="encrypt-switches">
+                    <label class="neumorph-switch-container">
+                        <div class="switch-label">With Reverser</div>
+                        <div class="neumorph-switch">
+                            <input type="checkbox" id="encrypt-reverser">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Action Button -->
+                <div class="ks-form-actions">
+                    <button class="dialog-cell dialog-cell-wide ks-gen-btn" id="btn-encrypt-action" onclick="performEncryption()">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M12 17a2 2 0 0 0 2-2 2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 0 2 2m6-9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h1V6a5 5 0 0 1 10 0v2h1m-6-5a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3z"/>
+                        </svg>
+                        <span id="encrypt-action-text">Encrypt</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Encryption Result Activity (Full Screen) ═══ -->
+    <div id="encrypt-result-activity" class="activity-overlay">
+        <div class="activity-container">
+            <!-- Header -->
+            <div class="activity-header">
+                <button class="activity-back-btn" id="btn-encrypt-result-close">
+                    <svg viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <h2 class="encrypt-result-title" id="encrypt-result-title">Result</h2>
+                <div style="width: 40px;"></div>
+            </div>
+            
+            <!-- Content -->
+            <div class="activity-content">
+                <div class="encrypt-result-card">
+                    <div class="encrypt-result-label" id="encrypt-result-label">Encrypted Result</div>
+                    <div id="encrypt-result-content" class="encrypt-result-text"></div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="activity-actions">
+                    <button class="activity-btn primary" id="btn-encrypt-copy">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                        <span>Copy Result</span>
+                    </button>
+                    <button class="activity-btn" id="btn-encrypt-new">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        <span>New</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

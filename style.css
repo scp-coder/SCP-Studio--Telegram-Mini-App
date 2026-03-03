@@ -75,6 +75,24 @@ body {
     object-fit: contain;
 }
 
+/* Icon theme support - black to white in dark mode */
+:root .scp-app-logo,
+:root .splash-logo {
+    filter: brightness(0) invert(1);
+}
+
+/* Keep blue elements blue */
+:root .scp-app-logo path[fill="#004FFF"],
+:root .splash-logo path[fill="#004FFF"] {
+    filter: none;
+}
+
+/* Light theme - normal colors */
+:root.light-theme .scp-app-logo,
+:root.light-theme .splash-logo {
+    filter: none;
+}
+
 .app-title {
     font-family: var(--font-heading);
     font-size: 1.3rem;
@@ -1026,4 +1044,245 @@ body {
 
 .encrypt-type-option:active {
     transform: scale(0.95);
+}
+
+/* ════════════════════════════════
+   ENCRYPTION RESULT ACTIVITY (Full Screen)
+   ════════════════════════════════ */
+.activity-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-color);
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.activity-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: calc(15px + var(--safe-area-top)) 20px var(--safe-area-bottom) 20px;
+}
+
+.activity-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    margin-bottom: 20px;
+}
+
+.activity-back-btn {
+    background: var(--bg-color);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
+    transition: all 0.2s;
+    border: none;
+}
+
+.activity-back-btn svg {
+    width: 22px;
+    height: 22px;
+    color: var(--primary-color);
+}
+
+.activity-back-btn:active {
+    box-shadow: inset 4px 4px 8px var(--dark-shadow), inset -4px -4px 8px var(--light-shadow);
+}
+
+.activity-title {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: center;
+    flex: 1;
+}
+
+.activity-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.encrypt-result-card {
+    background: var(--bg-color);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 8px 8px 16px var(--dark-shadow), -8px -8px 16px var(--light-shadow);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.encrypt-result-label {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.encrypt-result-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--primary-color);
+    word-break: break-all;
+    line-height: 1.6;
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--dark-shadow);
+    border-radius: 12px;
+}
+
+.activity-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 10px;
+}
+
+.activity-btn {
+    flex: 1;
+    background: var(--bg-color);
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    cursor: pointer;
+    box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
+    transition: all 0.2s;
+}
+
+.activity-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.activity-btn:active {
+    box-shadow: inset 4px 4px 8px var(--dark-shadow), inset -4px -4px 8px var(--light-shadow);
+}
+
+.activity-btn.primary {
+    color: var(--primary-color);
+}
+
+/* ════════════════════════════════════════════════════════
+   TEXT ENCRYPTION ACTIVITY (Full Screen)
+   ════════════════════════════════════════════════════════ */
+.encrypt-activity-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-color);
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.encrypt-activity-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.encrypt-activity-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: calc(15px + var(--safe-area-top)) 20px var(--safe-area-bottom) 20px;
+}
+
+.encrypt-activity-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    margin-bottom: 20px;
+}
+
+.encrypt-activity-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+}
+
+.encrypt-activity-content .encrypt-inputs {
+    flex: 1;
+    max-height: none;
+}
+
+.encrypt-activity-content .ks-form-actions {
+    margin-top: auto;
+    padding-top: 16px;
+}
+
+/* Header title alignment */
+.encrypt-activity-header .activity-title {
+    flex: 1;
+    text-align: center;
+}
+
+/* Encryption Sections */
+.encrypt-section {
+    margin-bottom: 16px;
+}
+
+.encrypt-section .ks-section-label {
+    margin-bottom: 8px;
+}
+
+/* Encryption Switches */
+.encrypt-switches {
+    margin: 16px 0;
+}
+
+/* Encryption Header Card */
+.encrypt-header-card {
+    background: var(--bg-color);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 8px 8px 16px var(--dark-shadow), -8px -8px 16px var(--light-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Encryption Content Card */
+.encrypt-content-card {
+    background: var(--bg-color);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 8px 8px 16px var(--dark-shadow), -8px -8px 16px var(--light-shadow);
+    flex: 1;
+    overflow-y: auto;
 }

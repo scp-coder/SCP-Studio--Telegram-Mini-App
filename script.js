@@ -303,19 +303,26 @@ let encryptType = 'base64';
 let encryptionHistory = [];
 
 const openEncryption = () => {
-    document.getElementById('encrypt-dialog').classList.add('open');
-    document.getElementById('encrypt-overlay').classList.add('open');
+    // Open full-screen activity instead of dialog
+    document.getElementById('encrypt-activity').classList.add('open');
     // Reset fields
     document.getElementById('encrypt-data').value = '';
+    document.getElementById('encrypt-output').value = '';
     document.getElementById('encrypt-key').value = '';
     document.getElementById('encrypt-reverser').checked = false;
     setEncryptMode('encrypt');
     setEncryptType('base64');
+    tg.HapticFeedback.impactOccurred('light');
+};
+
+// Go back to home screen
+window.goHome = () => {
+    tg.HapticFeedback.impactOccurred('light');
+    closeEncryption();
 };
 
 window.closeEncryption = () => {
-    document.getElementById('encrypt-dialog').classList.remove('open');
-    document.getElementById('encrypt-overlay').classList.remove('open');
+    document.getElementById('encrypt-activity').classList.remove('open');
 };
 
 window.setEncryptMode = (mode) => {
@@ -643,10 +650,8 @@ window.performEncryption = async () => {
             encryptionHistory.pop();
         }
         
-        showResultDialog(
-            `${typeLabel} ${operationType === 'encrypt' ? 'Encrypted' : 'Decrypted'}`,
-            result
-        );
+        // Show result in output textarea
+        document.getElementById('encrypt-output').value = result;
         
         tg.HapticFeedback.notificationOccurred('success');
     } catch (e) {
@@ -764,11 +769,23 @@ const generateSecurePassword = () => {
 // ─── Result Dialog ──────────────────────────────────────
 
 const showResultDialog = (title, content) => {
-    document.getElementById('res-dialog-title').innerText = title;
-    document.getElementById('res-dialog-content').innerText = content;
-    document.getElementById('result-dialog').classList.add('open');
-    document.getElementById('overlay').classList.add('open');
-    tg.HapticFeedback.notificationOccurred('success');
+    // Check if this is an encryption result
+    if (title && (title.includes('Encrypted') || title.includes('Decrypted'))) {
+        // Show in full-screen activity
+        document.getElementById('encrypt-result-title').innerText = title;
+        document.getElementById('encrypt-result-label').innerText = title.includes('Encrypted') ? 'Encrypted Result' : 'Decrypted Result';
+        document.getElementById('encrypt-result-content').innerText = content;
+        document.getElementById('encrypt-activity').classList.remove('open');
+        document.getElementById('encrypt-result-activity').classList.add('open');
+        tg.HapticFeedback.notificationOccurred('success');
+    } else {
+        // Show regular result dialog
+        document.getElementById('res-dialog-title').innerText = title;
+        document.getElementById('res-dialog-content').innerText = content;
+        document.getElementById('result-dialog').classList.add('open');
+        document.getElementById('overlay').classList.add('open');
+        tg.HapticFeedback.notificationOccurred('success');
+    }
 };
 
 const closeResultDialog = () => {
@@ -893,3 +910,4 @@ document.addEventListener('DOMContentLoaded', () => {
         splash.classList.add('fade-out');
     }, 2500);
 });
+
