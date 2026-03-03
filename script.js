@@ -1,6 +1,6 @@
 /**
  * SCP Studio — Mini App Script
- * Neumorphic UI + Settings Sheet (mirroring scp_studio_settings_sheet.xml)
+ * Neumorphic UI + Settings Sheet
  */
 
 const categories = {
@@ -41,12 +41,66 @@ const categories = {
 let currentCategory = 'programmer';
 const tg = window.Telegram.WebApp;
 
+// ─── Theme Management ──────────────────────────────────
+let currentTheme = 'light'; // Default is light (day)
+
+const applyTheme = (theme) => {
+    currentTheme = theme;
+    if (theme === 'light') {
+        document.documentElement.classList.add('light-theme');
+    } else {
+        document.documentElement.classList.remove('light-theme');
+    }
+    // Save to localStorage
+    localStorage.setItem('scp-studio-theme', theme);
+    // Update Telegram header/background colors
+    if (theme === 'light') {
+        tg.setHeaderColor('#e8ecf0');
+        tg.setBackgroundColor('#e8ecf0');
+    } else {
+        tg.setHeaderColor('#1a1d21');
+        tg.setBackgroundColor('#1a1d21');
+    }
+};
+
+const loadTheme = () => {
+    const savedTheme = localStorage.getItem('scp-studio-theme');
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else {
+        applyTheme('light'); // Default to light theme
+    }
+};
+
+const openThemeDialog = () => {
+    tg.HapticFeedback.selectionChanged();
+    document.getElementById('theme-dialog').classList.add('open');
+    document.getElementById('dialog-overlay').classList.add('open');
+    
+    // Update active state of buttons
+    document.getElementById('btn-theme-light').classList.toggle('active', currentTheme === 'light');
+    document.getElementById('btn-theme-dark').classList.toggle('active', currentTheme === 'dark');
+};
+
+window.closeThemeDialog = () => {
+    document.getElementById('theme-dialog').classList.remove('open');
+    document.getElementById('dialog-overlay').classList.remove('open');
+    document.getElementById('settings-dialog').classList.remove('open');
+};
+
+window.selectTheme = (theme) => {
+    event.preventDefault();
+    tg.HapticFeedback.impactOccurred('light');
+    applyTheme(theme);
+    closeThemeDialog();
+    showToast(theme === 'light' ? 'Light Theme Applied' : 'Dark Theme Applied');
+};
+
 // ─── Boot ──────────────────────────────────────────────
 const initSystem = () => {
     tg.ready();
     tg.expand();
-    tg.setHeaderColor('#1a1d21');
-    tg.setBackgroundColor('#1a1d21');
+    loadTheme(); // Load saved theme on startup
     renderTools();
 };
 
@@ -90,6 +144,8 @@ const handleToolClick = (toolId) => {
         openKeystore();
     } else if (toolId === 'password_gen') {
         openPasswordGen();
+    } else if (toolId === 'text_encryption') {
+        openEncryption();
     } else {
         tg.showAlert('Coming Soon: ' + toolId);
     }
@@ -240,6 +296,380 @@ const fillKeystoreDefaults = () => {
     document.getElementById('ks-country').value = pick(randoms.countries);
 };
 
+// ─── Text Encryption Tool ───────────────────────────────
+
+let encryptMode = 'encrypt';
+let encryptType = 'base64';
+let encryptionHistory = [];
+
+const openEncryption = () => {
+    document.getElementById('encrypt-dialog').classList.add('open');
+    document.getElementById('encrypt-overlay').classList.add('open');
+    // Reset fields
+    document.getElementById('encrypt-data').value = '';
+    document.getElementById('encrypt-key').value = '';
+    document.getElementById('encrypt-reverser').checked = false;
+    setEncryptMode('encrypt');
+    setEncryptType('base64');
+};
+
+window.closeEncryption = () => {
+    document.getElementById('encrypt-dialog').classList.remove('open');
+    document.getElementById('encrypt-overlay').classList.remove('open');
+};
+
+window.setEncryptMode = (mode) => {
+    encryptMode = mode;
+    const btnEncrypt = document.getElementById('btn-encrypt-mode');
+    const btnDecrypt = document.getElementById('btn-decrypt-mode');
+    const actionText = document.getElementById('encrypt-action-text');
+    
+    if (mode === 'encrypt') {
+        btnEncrypt.classList.add('active');
+        btnDecrypt.classList.remove('active');
+        actionText.textContent = 'Encrypt';
+    } else {
+        btnDecrypt.classList.add('active');
+        btnEncrypt.classList.remove('active');
+        actionText.textContent = 'Decrypt';
+    }
+    
+    tg.HapticFeedback.selectionChanged();
+};
+
+window.setEncryptType = (type) => {
+    encryptType = type;
+    const btnAES = document.getElementById('btn-type-aes');
+    const btnBase64 = document.getElementById('btn-type-base64');
+    const btnBase32 = document.getElementById('btn-type-base32');
+    const btnBase16 = document.getElementById('btn-type-base16');
+    const btnBase8 = document.getElementById('btn-type-base8');
+    
+    // Remove active class from all
+    btnAES?.classList.remove('active');
+    btnBase64?.classList.remove('active');
+    btnBase32?.classList.remove('active');
+    btnBase16?.classList.remove('active');
+    btnBase8?.classList.remove('active');
+    
+    // Add active class to selected
+    if (type === 'aes') btnAES?.classList.add('active');
+    if (type === 'base64') btnBase64?.classList.add('active');
+    if (type === 'base32') btnBase32?.classList.add('active');
+    if (type === 'base16') btnBase16?.classList.add('active');
+    if (type === 'base8') btnBase8?.classList.add('active');
+    
+    // Show/hide key field based on type
+    const keyField = document.getElementById('encrypt-key-field');
+    if (keyField) {
+        keyField.style.display = (type === 'aes') ? 'block' : 'none';
+    }
+    
+    tg.HapticFeedback.selectionChanged();
+};
+
+// Base64 encoding/decoding
+const base64Encode = (text) => {
+    return btoa(unescape(encodeURIComponent(text)));
+};
+
+const base64Decode = (encoded) => {
+    try {
+        return decodeURIComponent(escape(atob(encoded)));
+    } catch (e) {
+        throw new Error('Invalid Base64 data');
+    }
+};
+
+// Base32 encoding/decoding
+const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+const base32Encode = (text) => {
+    let binary = '';
+    for (let i = 0; i < text.length; i++) {
+        binary += text.charCodeAt(i).toString(2).padStart(8, '0');
+    }
+    
+    let result = '';
+    for (let i = 0; i < binary.length; i += 5) {
+        let chunk = binary.slice(i, i + 5);
+        if (chunk.length < 5) {
+            chunk = chunk.padEnd(5, '0');
+        }
+        result += base32Chars[parseInt(chunk, 2)];
+    }
+    
+    // Add padding
+    while (result.length % 8 !== 0) {
+        result += '=';
+    }
+    return result;
+};
+
+const base32Decode = (encoded) => {
+    try {
+        encoded = encoded.toUpperCase().replace(/=/g, '');
+        let binary = '';
+        for (let i = 0; i < encoded.length; i++) {
+            const char = encoded[i];
+            const index = base32Chars.indexOf(char);
+            if (index === -1) throw new Error('Invalid Base32 character');
+            binary += index.toString(2).padStart(5, '0');
+        }
+        
+        let result = '';
+        for (let i = 0; i < binary.length; i += 8) {
+            const byte = binary.slice(i, i + 8);
+            if (byte.length === 8) {
+                result += String.fromCharCode(parseInt(byte, 2));
+            }
+        }
+        return result;
+    } catch (e) {
+        throw new Error('Invalid Base32 data');
+    }
+};
+
+// Base16 (Hex) encoding/decoding
+const base16Encode = (text) => {
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        result += text.charCodeAt(i).toString(16).padStart(2, '0');
+    }
+    return result.toUpperCase();
+};
+
+const base16Decode = (encoded) => {
+    try {
+        let result = '';
+        for (let i = 0; i < encoded.length; i += 2) {
+            result += String.fromCharCode(parseInt(encoded.slice(i, i + 2), 16));
+        }
+        return result;
+    } catch (e) {
+        throw new Error('Invalid Base16 data');
+    }
+};
+
+// Base8 (Octal) encoding/decoding
+const base8Encode = (text) => {
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        result += text.charCodeAt(i).toString(8).padStart(3, '0');
+    }
+    return result;
+};
+
+const base8Decode = (encoded) => {
+    try {
+        let result = '';
+        for (let i = 0; i < encoded.length; i += 3) {
+            result += String.fromCharCode(parseInt(encoded.slice(i, i + 3), 8));
+        }
+        return result;
+    } catch (e) {
+        throw new Error('Invalid Base8 data');
+    }
+};
+
+// AES-256 Encryption/Decryption using Web Crypto API
+const aesEncrypt = async (text, key) => {
+    const encoder = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey(
+        'raw',
+        encoder.encode(key.padEnd(32, '0').slice(0, 32)),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveKey']
+    );
+    
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    const aesKey = await window.crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+    );
+    
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await window.crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        aesKey,
+        encoder.encode(text)
+    );
+    
+    // Combine salt + iv + encrypted data
+    const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+    combined.set(salt, 0);
+    combined.set(iv, salt.length);
+    combined.set(new Uint8Array(encrypted), salt.length + iv.length);
+    
+    // Convert to base64
+    return btoa(String.fromCharCode(...combined));
+};
+
+const aesDecrypt = async (encryptedData, key) => {
+    try {
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+        
+        // Decode from base64
+        const combined = new Uint8Array(atob(encryptedData).split('').map(c => c.charCodeAt(0)));
+        
+        const salt = combined.slice(0, 16);
+        const iv = combined.slice(16, 28);
+        const encrypted = combined.slice(28);
+        
+        const keyMaterial = await window.crypto.subtle.importKey(
+            'raw',
+            encoder.encode(key.padEnd(32, '0').slice(0, 32)),
+            { name: 'PBKDF2' },
+            false,
+            ['deriveKey']
+        );
+        
+        const aesKey = await window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+            keyMaterial,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['encrypt', 'decrypt']
+        );
+        
+        const decrypted = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv },
+            aesKey,
+            encrypted
+        );
+        
+        return decoder.decode(decrypted);
+    } catch (e) {
+        throw new Error('Decryption failed - invalid key or data');
+    }
+};
+
+window.performEncryption = async () => {
+    const data = document.getElementById('encrypt-data').value.trim();
+    const key = document.getElementById('encrypt-key').value.trim();
+    const withReverser = document.getElementById('encrypt-reverser').checked;
+    
+    if (!data) {
+        tg.showAlert('Error: Please enter text to encrypt/decrypt');
+        tg.HapticFeedback.notificationOccurred('error');
+        return;
+    }
+    
+    // Check key for AES
+    if (encryptType === 'aes' && !key) {
+        tg.showAlert('Error: Please enter a secret key for AES');
+        tg.HapticFeedback.notificationOccurred('error');
+        return;
+    }
+    
+    tg.HapticFeedback.impactOccurred('light');
+    
+    let result = '';
+    let operationType = encryptMode;
+    let typeLabel = encryptType.toUpperCase();
+    
+    try {
+        if (encryptMode === 'encrypt') {
+            let inputData = data;
+            if (withReverser) {
+                inputData = inputData.split('').reverse().join('');
+            }
+            
+            switch (encryptType) {
+                case 'aes':
+                    result = await aesEncrypt(inputData, key);
+                    break;
+                case 'base64':
+                    result = base64Encode(inputData);
+                    break;
+                case 'base32':
+                    result = base32Encode(inputData);
+                    break;
+                case 'base16':
+                    result = base16Encode(inputData);
+                    break;
+                case 'base8':
+                    result = base8Encode(inputData);
+                    break;
+            }
+        } else {
+            let inputData = data;
+            
+            switch (encryptType) {
+                case 'aes':
+                    try {
+                        result = await aesDecrypt(inputData, key);
+                    } catch (e) {
+                        result = inputData;
+                    }
+                    break;
+                case 'base64':
+                    result = base64Decode(inputData);
+                    break;
+                case 'base32':
+                    result = base32Decode(inputData);
+                    break;
+                case 'base16':
+                    result = base16Decode(inputData);
+                    break;
+                case 'base8':
+                    result = base8Decode(inputData);
+                    break;
+            }
+            
+            if (withReverser) {
+                result = result.split('').reverse().join('');
+            }
+        }
+        
+        // Add to history
+        encryptionHistory.unshift({
+            type: operationType,
+            encryptType: typeLabel,
+            original: data,
+            result: result,
+            key: key,
+            withReverser: withReverser,
+            timestamp: new Date().toLocaleTimeString()
+        });
+        
+        // Keep only last 10 items
+        if (encryptionHistory.length > 10) {
+            encryptionHistory.pop();
+        }
+        
+        showResultDialog(
+            `${typeLabel} ${operationType === 'encrypt' ? 'Encrypted' : 'Decrypted'}`,
+            result
+        );
+        
+        tg.HapticFeedback.notificationOccurred('success');
+    } catch (e) {
+        tg.showAlert('Error: ' + (e.message || 'Operation failed'));
+        tg.HapticFeedback.notificationOccurred('error');
+    }
+};
+
+// Show encryption history
+document.getElementById('btn-encrypt-history')?.addEventListener('click', () => {
+    tg.HapticFeedback.selectionChanged();
+    if (encryptionHistory.length === 0) {
+        tg.showAlert('No encryption history yet');
+    } else {
+        let historyText = 'Encryption History:\n\n';
+        encryptionHistory.slice(0, 5).forEach((item, i) => {
+            historyText += `${i + 1}. ${item.type.toUpperCase()} - ${item.timestamp}\n`;
+            historyText += `   ${item.original.substring(0, 20)}... → ${item.result.substring(0, 20)}...\n\n`;
+        });
+        tg.showAlert(historyText);
+    }
+});
+
 // ─── Password Generator ─────────────────────────────────
 
 const openPasswordGen = () => {
@@ -375,9 +805,10 @@ const setupListeners = () => {
         tg.HapticFeedback.impactOccurred('light');
         tg.showAlert('SCP Studio\nBy the SCP Developer Team.\n\nA professional mobile toolkit for Android developers.');
     });
+    
+    // Theme button - opens theme selection dialog
     document.getElementById('btn-theme')?.addEventListener('click', () => {
-        tg.HapticFeedback.impactOccurred('light');
-        tg.showAlert('Theme: DARK MODE LOCKED\nCurrently using Neumorphic Slate.');
+        openThemeDialog();
     });
 
     document.getElementById('btn-anim')?.addEventListener('click', () => {
@@ -391,12 +822,17 @@ const setupListeners = () => {
     });
 
     // Close dialogs by clicking overlay
-    document.getElementById('dialog-overlay')?.addEventListener('click', () => window.closeSettings());
+    document.getElementById('dialog-overlay')?.addEventListener('click', () => {
+        window.closeSettings();
+        window.closeThemeDialog();
+    });
     document.getElementById('ks-overlay')?.addEventListener('click', () => closeKeystore());
+    document.getElementById('encrypt-overlay')?.addEventListener('click', () => window.closeEncryption());
     document.getElementById('overlay')?.addEventListener('click', (e) => {
         if (e.target.id === 'overlay') {
             closePasswordGen();
             closeResultDialog();
+            window.closeEncryption();
         }
     });
 

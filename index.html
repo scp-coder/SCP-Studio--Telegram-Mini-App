@@ -321,11 +321,114 @@
         </div>
     </div>
 
+    <!-- ═══ Theme Selection Dialog ═══ -->
+    <div id="theme-dialog" class="settings-dialog theme-dialog">
+        <div class="dialog-title-bar">
+            <h2 class="dialog-title">Choose Theme</h2>
+            <button class="dialog-icon-btn" onclick="closeThemeDialog()">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg>
+            </button>
+        </div>
+        
+        <div class="theme-options">
+            <button type="button" class="dialog-cell theme-option" id="btn-theme-light" onclick="selectTheme('light')">
+                <svg viewBox="0 0 24 24" class="theme-icon">
+                    <path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5s5-2.24 5-5S14.76 7 12 7L12 7zM2 13l2 0c0.55 0 1-0.45 1-1s-0.45-1-1-1l-2 0c-0.55 0-1 0.45-1 1S1.45 13 2 13zM20 13l2 0c0.55 0 1-0.45 1-1s-0.45-1-1-1l-2 0c-0.55 0-1 0.45-1 1S19.45 13 20 13zM11 2v2c0 0.55 0.45 1 1 1s1-0.45 1-1V2c0-0.55-0.45-1-1-1S11 1.45 11 2zM11 20v2c0 0.55 0.45 1 1 1s1-0.45 1-1v-2c0-0.55-0.45-1-1-1S11 19.45 11 20zM5.99 4.58c-0.39-0.39-1.03-0.39-1.41 0c-0.39 0.39-0.39 1.03 0 1.41l1.06 1.06c0.39 0.39 1.03 0.39 1.41 0s0.39-1.03 0-1.41L5.99 4.58zM18.36 16.95c-0.39-0.39-1.03-0.39-1.41 0c-0.39 0.39-0.39 1.03 0 1.41l1.06 1.06c0.39 0.39 1.03 0.39 1.41 0c0.39-0.39 0.39-1.03 0-1.41L18.36 16.95zM19.42 5.99c0.39-0.39 0.39-1.03 0-1.41c-0.39-0.39-1.03-0.39-1.41 0l-1.06 1.06c-0.39 0.39-0.39 1.03 0 1.41s1.03 0.39 1.41 0L19.42 5.99zM7.05 18.36c0.39-0.39 0.39-1.03 0-1.41c-0.39-0.39-1.03-0.39-1.41 0l-1.06 1.06c-0.39 0.39-0.39 1.03 0 1.41s1.03 0.39 1.41 0L7.05 18.36z" />
+                </svg>
+                <span>Light</span>
+                <span class="theme-desc">Day</span>
+            </button>
+            <button type="button" class="dialog-cell theme-option" id="btn-theme-dark" onclick="selectTheme('dark')">
+                <svg viewBox="0 0 24 24" class="theme-icon">
+                    <path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9s9-4.03 9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98 1.37-2.58 2.26-4.4 2.26c-2.98 0-5.4-2.42-5.4-5.4c0-1.81 0.89-3.42 2.26-4.4C12.92 3.04 12.46 3 12 3L12 3z" />
+                </svg>
+                <span>Dark</span>
+                <span class="theme-desc">Night</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══ Text Encryption Dialog ═══ -->
+    <div id="encrypt-overlay" class="dialog-overlay" onclick="closeEncryption()"></div>
+    <div id="encrypt-dialog" class="settings-dialog ks-dialog encrypt-dialog">
+        <!-- Header with title and history -->
+        <div class="encrypt-header">
+            <div class="encrypt-header-left">
+                <h2 class="dialog-title encrypt-title">Text Encryption</h2>
+            </div>
+            <div class="encrypt-header-right">
+                <button class="dialog-icon-btn encrypt-history-btn" id="btn-encrypt-history" title="History">
+                    <svg viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Encryption Type Selector -->
+        <div class="encrypt-type-selector">
+            <button type="button" class="encrypt-type-option" id="btn-type-aes" onclick="setEncryptType('aes')">
+                AES-256
+            </button>
+            <button type="button" class="encrypt-type-option active" id="btn-type-base64" onclick="setEncryptType('base64')">
+                Base64
+            </button>
+            <button type="button" class="encrypt-type-option" id="btn-type-base32" onclick="setEncryptType('base32')">
+                Base32
+            </button>
+            <button type="button" class="encrypt-type-option" id="btn-type-base16" onclick="setEncryptType('base16')">
+                Base16
+            </button>
+            <button type="button" class="encrypt-type-option" id="btn-type-base8" onclick="setEncryptType('base8')">
+                Base8
+            </button>
+        </div>
+
+        <!-- Encrypt/Decrypt Toggle -->
+        <div class="encrypt-mode-toggle">
+            <button type="button" class="encrypt-mode-btn active" id="btn-encrypt-mode" onclick="setEncryptMode('encrypt')">
+                Encrypt
+            </button>
+            <button type="button" class="encrypt-mode-btn" id="btn-decrypt-mode" onclick="setEncryptMode('decrypt')">
+                Decrypt
+            </button>
+        </div>
+
+        <!-- Input Fields -->
+        <div class="ks-input-group encrypt-inputs">
+            <div class="ks-section-label">Your Data</div>
+            <textarea id="encrypt-data" class="ks-input encrypt-textarea" placeholder="Enter text to encrypt/decrypt..." rows="4"></textarea>
+
+            <div id="encrypt-key-field">
+                <div class="ks-section-label" id="encrypt-key-label">Secret Key</div>
+                <input type="text" id="encrypt-key" class="ks-input" placeholder="Enter secret key (for AES only)">
+            </div>
+
+            <!-- With Reverser Switch -->
+            <label class="neumorph-switch-container">
+                <div class="switch-label">With Reverser</div>
+                <div class="neumorph-switch">
+                    <input type="checkbox" id="encrypt-reverser">
+                    <span class="slider"></span>
+                </div>
+            </label>
+        </div>
+
+        <!-- Action Button -->
+        <div class="ks-form-actions">
+            <button class="dialog-cell dialog-cell-wide ks-gen-btn" id="btn-encrypt-action" onclick="performEncryption()">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 17a2 2 0 0 0 2-2 2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 0 2 2m6-9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h1V6a5 5 0 0 1 10 0v2h1m-6-5a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3z"/>
+                </svg>
+                <span id="encrypt-action-text">Encrypt</span>
+            </button>
+        </div>
+    </div>
+
     <div id="toast" class="toast"></div>
     <div id="overlay" class="overlay"></div>
-    <div class="scanner-line"></div>
-    <div class="vignette"></div>
     <script src="script.js"></script>
 </body>
-
 </html>
