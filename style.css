@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
 :root {
     --bg-color: #1a1d21;
     --light-shadow: #24282d;
@@ -507,14 +509,189 @@ body {
     }
 }
 
-@keyframes loading {
-    0% {
-        left: -60%;
-    }
+/* ─── Slider ─── */
+.neumorph-slider {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: var(--dark-shadow);
+    border-radius: 12px;
+    outline: none;
+    box-shadow: inset 2px 2px 5px var(--dark-shadow), inset -2px -2px 5px var(--light-shadow);
+    margin: 15px 0;
+}
 
-    100% {
-        left: 100%;
-    }
+.neumorph-slider::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 3px 3px 6px var(--dark-shadow), -3px -3px 6px var(--light-shadow);
+    border: 2px solid var(--bg-color);
+}
+
+.pass-length-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.pass-val {
+    color: var(--primary-color);
+}
+
+/* ─── Checkbox ─── */
+.neumorph-checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.neumorph-checkbox-container.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.neumorph-checkbox-container input {
+    display: none;
+}
+
+.neumorph-checkbox {
+    width: 22px;
+    height: 22px;
+    background: var(--bg-color);
+    border-radius: 6px;
+    box-shadow: 4px 4px 8px var(--dark-shadow), -4px -4px 8px var(--light-shadow);
+    position: relative;
+    transition: 0.3s;
+}
+
+.neumorph-checkbox-container input:checked+.neumorph-checkbox {
+    box-shadow: inset 2px 2px 5px var(--dark-shadow), inset -2px -2px 5px var(--light-shadow);
+}
+
+.neumorph-checkbox-container input:checked+.neumorph-checkbox::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* ─── Switch ─── */
+.neumorph-switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 0.85rem;
+    color: var(--text-color);
+}
+
+.neumorph-switch {
+    position: relative;
+    width: 44px;
+    height: 22px;
+}
+
+.neumorph-switch input {
+    display: none;
+}
+
+.neumorph-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--bg-color);
+    border-radius: 20px;
+    box-shadow: 3px 3px 6px var(--dark-shadow), -3px -3px 6px var(--light-shadow);
+    transition: .4s;
+}
+
+.neumorph-switch .slider:before {
+    content: "";
+    position: absolute;
+    height: 14px;
+    width: 14px;
+    left: 4px;
+    bottom: 4px;
+    background: var(--text-color);
+    border-radius: 50%;
+    transition: .4s;
+}
+
+.neumorph-switch input:checked+.slider {
+    background: var(--bg-color);
+}
+
+.neumorph-switch input:checked+.slider:before {
+    transform: translateX(22px);
+    background: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+/* ─── Strength Chip ─── */
+.pass-chip {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 10px;
+    text-align: center;
+    width: fit-content;
+    align-self: center;
+}
+
+.pass-chip.weak {
+    background: #ff4d4d;
+    color: white;
+}
+
+.pass-chip.medium {
+    background: #ffa64d;
+    color: white;
+}
+
+.pass-chip.strong {
+    background: #4dff88;
+    color: #004d1a;
+}
+
+/* ─── Result Dialog ─── */
+.res-dialog {
+    max-width: 320px;
+}
+
+.res-content-card {
+    background: var(--bg-color);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: inset 4px 4px 10px var(--dark-shadow), inset -4px -4px 10px var(--light-shadow);
+    word-break: break-all;
+    text-align: center;
+}
+
+.res-text-content {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    letter-spacing: 1px;
 }
 
 .ks-gen-btn {
@@ -642,4 +819,41 @@ body {
     background: radial-gradient(circle, transparent 70%, rgba(0, 0, 0, 0.5) 100%);
     pointer-events: none;
     z-index: 999;
+}
+
+/* ─── Toast ─── */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    z-index: 3000;
+    transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.ks-dialog.ks-hidden {
+    display: none !important;
+}
+
+.ks-hidden {
+    display: none !important;
+}
+
+.neumorph-switch-container.disabled {
+    opacity: 0.5;
+    pointer-events: none;
 }

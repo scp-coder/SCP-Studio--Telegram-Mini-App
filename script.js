@@ -72,7 +72,7 @@ const renderTools = () => {
                     <header class="item-header"><h2 class="item-id">${item.title}</h2></header>
                     <p class="item-desc">${item.desc}</p>
                 </div>`;
-            card.addEventListener('click', () => handleToolClick(item));
+            card.addEventListener('click', () => handleToolClick(item.id));
             card.style.cssText = 'opacity:0;transform:translateY(15px)';
             list.appendChild(card);
             setTimeout(() => {
@@ -84,12 +84,14 @@ const renderTools = () => {
     }, 160);
 };
 
-const handleToolClick = (tool) => {
-    tg.HapticFeedback.impactOccurred('medium');
-    if (tool.id === 'keystore_tools') {
+const handleToolClick = (toolId) => {
+    tg.HapticFeedback.impactOccurred('light');
+    if (toolId === 'keystore_tools') {
         openKeystore();
+    } else if (toolId === 'password_gen') {
+        openPasswordGen();
     } else {
-        tg.showAlert(`${tool.title}\n\nStatus: SECURE\nInitializing module...`);
+        tg.showAlert('Coming Soon: ' + toolId);
     }
 };
 
@@ -237,6 +239,133 @@ const fillKeystoreDefaults = () => {
     document.getElementById('ks-state').value = pick(randoms.states);
     document.getElementById('ks-country').value = pick(randoms.countries);
 };
+
+// ─── Password Generator ─────────────────────────────────
+
+const openPasswordGen = () => {
+    document.getElementById('pass-dialog').classList.add('active');
+    document.getElementById('overlay').classList.add('active');
+    updateStrengthStatus();
+};
+
+const closePasswordGen = () => {
+    document.getElementById('pass-dialog').classList.remove('active');
+    document.getElementById('overlay').classList.remove('active');
+};
+
+const updateStrengthStatus = () => {
+    const length = parseInt(document.getElementById('pass-length-slider').value);
+    const upper = document.getElementById('pass-upper').checked;
+    const lower = document.getElementById('pass-lower').checked;
+    const digits = document.getElementById('pass-digits').checked;
+    const symbols = document.getElementById('pass-symbols').checked;
+
+    let score = 0;
+    if (length >= 8) score++;
+    if (length >= 12) score++;
+    if (upper) score++;
+    if (lower) score++;
+    if (digits) score++;
+    if (symbols) score++;
+
+    const chip = document.getElementById('pass-strength-chip');
+    chip.className = 'pass-chip';
+    if (score < 3) {
+        chip.innerText = 'Weak';
+        chip.classList.add('weak');
+    } else if (score < 5) {
+        chip.innerText = 'Medium';
+        chip.classList.add('medium');
+    } else {
+        chip.innerText = 'Strong';
+        chip.classList.add('strong');
+    }
+};
+
+const generateSecurePassword = () => {
+    const length = parseInt(document.getElementById('pass-length-slider').value);
+    const useUpper = document.getElementById('pass-upper').checked;
+    const useLower = document.getElementById('pass-lower').checked;
+    const useDigits = document.getElementById('pass-digits').checked;
+    const useSymbols = document.getElementById('pass-symbols').checked;
+    const excludeAmbiguous = document.getElementById('pass-ambiguous').checked;
+
+    if (!useUpper && !useLower && !useDigits && !useSymbols) {
+        tg.showAlert('Error: Select at least one character type');
+        return;
+    }
+
+    const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const LOWER = "abcdefghijklmnopqrstuvwxyz";
+    const DIGITS = "0123456789";
+    const SYMBOLS = "!@#$%^&*()-_=+[]{}|;:,.<>?/";
+    const AMBIGUOUS = "l1IO0";
+
+    let charPool = "";
+    if (useUpper) charPool += UPPER;
+    if (useLower) charPool += LOWER;
+    if (useDigits) charPool += DIGITS;
+    if (useSymbols) charPool += SYMBOLS;
+
+    if (excludeAmbiguous) {
+        let filteredPool = "";
+        for (let char of charPool) {
+            if (!AMBIGUOUS.includes(char)) filteredPool += char;
+        }
+        charPool = filteredPool;
+    }
+
+    if (charPool.length === 0) {
+        tg.showAlert('Error: Character pool is empty');
+        return;
+    }
+
+    let password = "";
+    const randomArray = new Uint32Array(length);
+    window.crypto.getRandomValues(randomArray);
+
+    for (let i = 0; i < length; i++) {
+        password += charPool.charAt(randomArray[i] % charPool.length);
+    }
+
+    showResultDialog("Generated Password", password);
+};
+
+// ─── Result Dialog ──────────────────────────────────────
+
+const showResultDialog = (title, content) => {
+    document.getElementById('res-dialog-title').innerText = title;
+    document.getElementById('res-dialog-content').innerText = content;
+    document.getElementById('result-dialog').classList.add('active');
+    document.getElementById('overlay').classList.add('active');
+    tg.HapticFeedback.notificationOccurred('success');
+};
+
+const closeResultDialog = () => {
+    document.getElementById('result-dialog').classList.remove('active');
+    // Don't remove overlay if another dialog is open
+    if (!document.querySelector('.settings-dialog.active:not(.res-dialog)')) {
+        document.getElementById('overlay').classList.remove('active');
+    }
+};
+
+const copyResult = () => {
+    const text = document.getElementById('res-dialog-content').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        tg.HapticFeedback.impactOccurred('light');
+        showToast("Copied to clipboard!");
+    });
+};
+
+const showToast = (msg) => {
+    const toast = document.getElementById('toast');
+    toast.innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+};
+
+// ─── Initialization ─────────────────────────────────────
+
 const setupListeners = () => {
     document.getElementById('settings-trigger')?.addEventListener('click', openSettings);
     document.getElementById('special-tools')?.addEventListener('click', switchCategory);
@@ -261,17 +390,59 @@ const setupListeners = () => {
         tg.showAlert('Keyboard Shortcuts:\n• Tap chip → Switch Category\n• Long press item → Options');
     });
 
+    // Close dialogs by clicking overlay
+    document.getElementById('dialog-overlay')?.addEventListener('click', () => window.closeSettings());
+    document.getElementById('ks-overlay')?.addEventListener('click', () => closeKeystore());
+    document.getElementById('overlay')?.addEventListener('click', (e) => {
+        if (e.target.id === 'overlay') {
+            closePasswordGen();
+            closeResultDialog();
+        }
+    });
+
+    // KeyStore Tool Listeners
     document.getElementById('btn-ks-generate')?.addEventListener('click', startKeystoreGeneration);
     document.getElementById('btn-ks-download')?.addEventListener('click', downloadKeystore);
     document.getElementById('btn-ks-autofill')?.addEventListener('click', fillKeystoreDefaults);
 
+    // Password Tool Listeners
+    document.getElementById('pass-length-slider')?.addEventListener('input', (e) => {
+        document.getElementById('pass-length-val').innerText = e.target.value;
+        updateStrengthStatus();
+    });
+
+    const passOptionListeners = ['pass-upper', 'pass-lower', 'pass-digits', 'pass-symbols'];
+    passOptionListeners.forEach(id => {
+        document.getElementById(id)?.addEventListener('change', updateStrengthStatus);
+    });
+
+    document.getElementById('pass-easy')?.addEventListener('change', (e) => {
+        const digits = document.getElementById('pass-digits');
+        const symbols = document.getElementById('pass-symbols');
+        if (e.target.checked) {
+            digits.checked = false;
+            symbols.checked = false;
+            digits.parentElement.classList.add('disabled');
+            symbols.parentElement.classList.add('disabled');
+        } else {
+            digits.parentElement.classList.remove('disabled');
+            symbols.parentElement.classList.remove('disabled');
+        }
+        updateStrengthStatus();
+    });
+
+    document.getElementById('btn-pass-generate')?.addEventListener('click', generateSecurePassword);
+    document.getElementById('btn-res-copy')?.addEventListener('click', copyResult);
+
+    // Social Buttons
     document.getElementById('btn-telegram')?.addEventListener('click', () => {
         tg.HapticFeedback.impactOccurred('light');
         window.open('https://t.me/SCPStudioDev', '_blank');
     });
+
     document.getElementById('btn-discord')?.addEventListener('click', () => {
         tg.HapticFeedback.impactOccurred('light');
-        tg.showAlert('Discord: Coming Soon.');
+        window.open('https://discord.gg/YxbeXv5BEx', '_blank');
     });
 };
 

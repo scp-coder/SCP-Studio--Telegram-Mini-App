@@ -209,6 +209,120 @@
         </div>
     </div>
 
+    <!-- ═══ Password Generator Tool ═══ -->
+    <div id="pass-dialog" class="settings-dialog ks-dialog">
+        <div class="dialog-title-bar">
+            <h2 class="dialog-title">Password Generator</h2>
+            <button class="dialog-icon-btn" onclick="closePasswordGen()">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="ks-input-group">
+            <div class="pass-length-section">
+                <div class="pass-length-header">
+                    <span>Length</span>
+                    <span id="pass-length-val" class="pass-val">12</span>
+                </div>
+                <input type="range" id="pass-length-slider" min="4" max="64" value="12" class="neumorph-slider">
+            </div>
+
+            <div id="pass-strength-chip" class="pass-chip medium">Medium</div>
+
+            <div class="ks-divider"></div>
+
+            <div class="ks-section-label">Character Types</div>
+            <label class="neumorph-checkbox-container">
+                <input type="checkbox" id="pass-upper" checked>
+                <div class="neumorph-checkbox"></div>
+                <span>Uppercase (A-Z)</span>
+            </label>
+            <label class="neumorph-checkbox-container">
+                <input type="checkbox" id="pass-lower" checked>
+                <div class="neumorph-checkbox"></div>
+                <span>Lowercase (a-z)</span>
+            </label>
+            <label class="neumorph-checkbox-container">
+                <input type="checkbox" id="pass-digits" checked>
+                <div class="neumorph-checkbox"></div>
+                <span>Numbers (0-9)</span>
+            </label>
+            <label class="neumorph-checkbox-container">
+                <input type="checkbox" id="pass-symbols" checked>
+                <div class="neumorph-checkbox"></div>
+                <span>Symbols (!@#$%)</span>
+            </label>
+
+            <div class="ks-divider"></div>
+
+            <div class="ks-section-label">Options</div>
+            <label class="neumorph-switch-container">
+                <div class="switch-label">Exclude Ambiguous (0, O, I, l)</div>
+                <div class="neumorph-switch">
+                    <input type="checkbox" id="pass-ambiguous" checked>
+                    <span class="slider"></span>
+                </div>
+            </label>
+            <label class="neumorph-switch-container">
+                <div class="switch-label">Easy to Say (No numbers/symbols)</div>
+                <div class="neumorph-switch">
+                    <input type="checkbox" id="pass-easy">
+                    <span class="slider"></span>
+                </div>
+            </label>
+        </div>
+
+        <div class="ks-form-actions">
+            <button class="dialog-cell ks-action-btn" id="btn-pass-cancel" onclick="closePasswordGen()">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg>
+                <span>Cancel</span>
+            </button>
+            <button class="dialog-cell dialog-cell-wide ks-gen-btn" id="btn-pass-generate">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                        d="M12.65 10C11.83 7.67 9.61 6 7 6a5 5 0 0 0-5 5 5 5 0 0 0 5 5c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-2H12.65M7 14a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z" />
+                </svg>
+                <span>Generate</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══ Result Dialog (General for Tools) ═══ -->
+    <div id="result-dialog" class="settings-dialog ks-dialog res-dialog">
+        <div class="dialog-title-bar">
+            <h2 class="dialog-title" id="res-dialog-title">Result</h2>
+            <button class="dialog-icon-btn" onclick="closeResultDialog()">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg>
+            </button>
+        </div>
+        <div class="res-content-card">
+            <div id="res-dialog-content" class="res-text-content"></div>
+        </div>
+        <div class="ks-form-actions">
+            <button class="dialog-cell ks-action-btn" id="btn-res-copy">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                        d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+                </svg>
+                <span>Copy</span>
+            </button>
+            <button class="dialog-cell ks-action-btn" onclick="closeResultDialog()">
+                <span>Close</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <div id="overlay" class="overlay"></div>
     <div class="scanner-line"></div>
     <div class="vignette"></div>
     <script src="script.js"></script>
