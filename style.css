@@ -370,6 +370,23 @@ body {
     display: none !important;
 }
 
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 210;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ─── Toast ─── */
 .ks-dialog {
     max-height: 90vh;
 }

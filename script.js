@@ -243,14 +243,14 @@ const fillKeystoreDefaults = () => {
 // ─── Password Generator ─────────────────────────────────
 
 const openPasswordGen = () => {
-    document.getElementById('pass-dialog').classList.add('active');
-    document.getElementById('overlay').classList.add('active');
+    document.getElementById('pass-dialog').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
     updateStrengthStatus();
 };
 
 const closePasswordGen = () => {
-    document.getElementById('pass-dialog').classList.remove('active');
-    document.getElementById('overlay').classList.remove('active');
+    document.getElementById('pass-dialog').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
 };
 
 const updateStrengthStatus = () => {
@@ -336,16 +336,16 @@ const generateSecurePassword = () => {
 const showResultDialog = (title, content) => {
     document.getElementById('res-dialog-title').innerText = title;
     document.getElementById('res-dialog-content').innerText = content;
-    document.getElementById('result-dialog').classList.add('active');
-    document.getElementById('overlay').classList.add('active');
+    document.getElementById('result-dialog').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
     tg.HapticFeedback.notificationOccurred('success');
 };
 
 const closeResultDialog = () => {
-    document.getElementById('result-dialog').classList.remove('active');
+    document.getElementById('result-dialog').classList.remove('open');
     // Don't remove overlay if another dialog is open
-    if (!document.querySelector('.settings-dialog.active:not(.res-dialog)')) {
-        document.getElementById('overlay').classList.remove('active');
+    if (!document.querySelector('.settings-dialog.open:not(.res-dialog)')) {
+        document.getElementById('overlay').classList.remove('open');
     }
 };
 
