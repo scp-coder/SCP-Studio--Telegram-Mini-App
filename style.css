@@ -1,0 +1,396 @@
+:root {
+    --bg-color: #1a1d21;
+    --light-shadow: #24282d;
+    --dark-shadow: #101215;
+    --primary-color: #004fff;
+    --text-color: #ffffff;
+    --text-muted: #aeb9c4;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'JetBrains Mono', monospace;
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-body);
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: calc(15px + var(--safe-area-top)) 20px var(--safe-area-bottom) 20px;
+}
+
+/* ─── Action Bar ─── */
+.action-bar-card {
+    background: var(--bg-color);
+    border-radius: 24px;
+    padding: 12px;
+    margin-bottom: 20px;
+    box-shadow: 10px 10px 20px var(--dark-shadow), -10px -10px 20px var(--light-shadow);
+}
+
+.top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+}
+
+.brand-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.scp-app-logo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
+.app-title {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--primary-color);
+    text-shadow: 1px 1px 2px var(--dark-shadow);
+}
+
+.settings-btn {
+    background: var(--bg-color);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.settings-btn:active {
+    box-shadow: inset 4px 4px 8px var(--dark-shadow), inset -4px -4px 8px var(--light-shadow);
+    transform: scale(0.95);
+}
+
+.btn-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--primary-color);
+}
+
+/* ─── Chip ─── */
+.tools-row {
+    padding: 8px;
+    margin-top: 5px;
+}
+
+.tool-chip {
+    background: var(--bg-color);
+    color: var(--primary-color);
+    border-radius: 16px;
+    padding: 14px;
+    text-align: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
+    transition: all 0.4s;
+    cursor: pointer;
+}
+
+.tool-chip:active {
+    box-shadow: inset 4px 4px 8px var(--dark-shadow), inset -4px -4px 8px var(--light-shadow);
+}
+
+/* ─── Scroller ─── */
+.main-scroller {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 5px 30px 5px;
+    scrollbar-width: none;
+}
+
+.main-scroller::-webkit-scrollbar {
+    display: none;
+}
+
+.recycler-view-emulation {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: opacity 0.3s;
+}
+
+.recycler-view-emulation.fading {
+    opacity: 0;
+}
+
+/* ─── List Items ─── */
+.list-item-card {
+    background: var(--bg-color);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 8px 8px 16px var(--dark-shadow), -8px -8px 16px var(--light-shadow);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+
+.list-item-card:active {
+    box-shadow: inset 6px 6px 12px var(--dark-shadow), inset -6px -6px 12px var(--light-shadow);
+    transform: scale(0.98);
+}
+
+.item-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.item-id {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.item-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* ════════════════════════════════
+   SETTINGS DIALOG (Centered Modal)
+   ════════════════════════════════ */
+.dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(6px);
+}
+
+.dialog-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.settings-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.88);
+    width: min(92vw, 420px);
+    background: var(--bg-color);
+    border-radius: 28px;
+    box-shadow:
+        16px 16px 32px var(--dark-shadow),
+        -16px -16px 32px var(--light-shadow),
+        0 0 0 1px rgba(0, 79, 255, 0.08);
+    z-index: 300;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.3s ease;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.settings-dialog.open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Title bar */
+.dialog-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.dialog-title {
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    flex: 1;
+    text-align: center;
+}
+
+.dialog-icon-btn {
+    background: var(--bg-color);
+    border: none;
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--primary-color);
+    box-shadow: 4px 4px 8px var(--dark-shadow), -4px -4px 8px var(--light-shadow);
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.dialog-icon-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.dialog-icon-btn:active {
+    box-shadow: inset 3px 3px 6px var(--dark-shadow), inset -3px -3px 6px var(--light-shadow);
+}
+
+/* Grid rows */
+.dialog-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.dialog-cell {
+    flex: 1;
+    background: var(--bg-color);
+    border: none;
+    border-radius: 20px;
+    padding: 18px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    color: var(--primary-color);
+    box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
+    transition: all 0.2s;
+    min-width: 0;
+}
+
+.dialog-cell svg {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+}
+
+.dialog-cell span {
+    font-size: 0.72rem;
+    font-family: var(--font-heading);
+    color: var(--primary-color);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.dialog-cell:active {
+    box-shadow: inset 4px 4px 8px var(--dark-shadow), inset -4px -4px 8px var(--light-shadow);
+    transform: scale(0.95);
+}
+
+/* Wide cell (Report) */
+.dialog-cell-wide {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 18px;
+    padding: 18px 20px;
+}
+
+.dialog-cell-wide span {
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+/* Connect row */
+.dialog-connect-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 6px 0;
+}
+
+.dialog-social-btn {
+    background: var(--bg-color);
+    border: none;
+    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 4px 4px 8px var(--dark-shadow), -4px -4px 8px var(--light-shadow);
+    transition: all 0.2s;
+}
+
+.dialog-social-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+.dialog-social-btn:active {
+    box-shadow: inset 3px 3px 6px var(--dark-shadow), inset -3px -3px 6px var(--light-shadow);
+}
+
+.dialog-connect-label {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    color: var(--primary-color);
+}
+
+/* ─── Visual Overlays ─── */
+.scanner-line {
+    position: fixed;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(0, 79, 255, 0.05);
+    box-shadow: 0 0 10px rgba(0, 79, 255, 0.1);
+    z-index: 1001;
+    pointer-events: none;
+    animation: scan 15s linear infinite;
+}
+
+@keyframes scan {
+    0% {
+        top: -10px;
+    }
+
+    100% {
+        top: 100%;
+    }
+}
+
+.vignette {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, transparent 70%, rgba(0, 0, 0, 0.5) 100%);
+    pointer-events: none;
+    z-index: 999;
+}
